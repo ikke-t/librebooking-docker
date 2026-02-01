@@ -58,7 +58,14 @@ RUN set -ex; \
     mkdir --parent /var/log/librebooking; \
     chown www-data:www-data /var/log/librebooking; \
     touch /usr/local/etc/php/conf.d/librebooking.ini; \
-    chown www-data:www-data /usr/local/etc/php/conf.d/librebooking.ini
+    chown www-data:www-data /usr/local/etc/php/conf.d/librebooking.ini; \
+    sed \
+      -i /etc/apache2/ports.conf \
+      -e 's/Listen 80/Listen 8080/' \
+      -e 's/Listen 443/Lisen 8443/'; \
+    sed \
+      -i /etc/apache2/sites-available/000-default.conf \
+      -e 's/<VirtualHost *:80>/<VirtualHost *:8080>/';
 
 # Get and customize librebooking
 USER www-data
@@ -89,3 +96,4 @@ WORKDIR    /
 VOLUME     /config
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 CMD        ["apache2-foreground"]
+EXPOSE     8080

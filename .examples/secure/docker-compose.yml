@@ -59,6 +59,7 @@ services:
       - LB_UPLOADS_IMAGE_UPLOAD_URL=Web/uploads/images
       - LB_UPLOADS_RESERVATION_ATTACHMENT_PATH=Web/uploads/reservation
       - VIRTUAL_HOST=acme.org
+      - VIRTUAL_PORT=8080
       - VIRTUAL_PATH=/book
       - LETSENCRYPT_HOST=acme.org
     secrets:
@@ -104,6 +105,7 @@ services:
       - LB_LOGGING_SQL=false
       - LB_DEFAULT_TIMEZONE=Europe/Zurich
       - VIRTUAL_HOST=acme.org
+      - VIRTUAL_PORT=8080
       - LETSENCRYPT_HOST=acme.org
     secrets:
       - lb_install_pwd
