@@ -16,7 +16,7 @@ LABEL org.opencontainers.image.authors="colisee@hotmail.com"
 COPY --chmod=755 bin /usr/local/bin/
 
 # Create cron jobs
-COPY --chown=www-data:www-data lb-jobs-cron /config/
+COPY --chown=www-data:root --chmod=0775 lb-jobs-cron /config/
 
 # Copy composer
 COPY --from=comp /usr/bin/composer /usr/bin/composer
@@ -37,9 +37,8 @@ RUN set -ex; \
     apt-get clean; \
     rm -rf /var/lib/apt/lists/*
 
-# Customize
+# Customize the http & php environment
 RUN set -ex; \
-    chown www-data:www-data /config;\
     cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"; \
     { \
      echo 'RemoteIPHeader X-Real-IP'; \
@@ -56,9 +55,10 @@ RUN set -ex; \
     pecl install timezonedb; \
     docker-php-ext-enable timezonedb; \
     mkdir --parent /var/log/librebooking; \
-    chown www-data:www-data /var/log/librebooking; \
+    chown --recursive www-data:root /var/log/librebooking; \
+    chmod --recursive g+rwx /var/log/librebooking; \
     touch /usr/local/etc/php/conf.d/librebooking.ini; \
-    chown www-data:www-data /usr/local/etc/php/conf.d/librebooking.ini; \
+    chown www-data:root /usr/local/etc/php/conf.d/librebooking.ini; \
     sed \
       -i /etc/apache2/ports.conf \
       -e 's/Listen 80/Listen 8080/' \
@@ -68,7 +68,6 @@ RUN set -ex; \
       -e 's/<VirtualHost *:80>/<VirtualHost *:8080>/';
 
 # Get and customize librebooking
-USER www-data
 ARG APP_GH_REF
 RUN set -ex; \
     curl \
@@ -89,9 +88,12 @@ RUN set -ex; \
       -e "s:localhost:%:g"; \
     if ! [ -d /var/www/html/tpl_c ]; then \
       mkdir /var/www/html/tpl_c; \
-    fi
+    fi; \
+    chown --recursive www-data:root /var/www/html; \
+    chmod --recursive g+rwx /var/www/html
 
 # Environment
+USER       www-data
 WORKDIR    /
 VOLUME     /config
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
