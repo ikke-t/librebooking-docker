@@ -155,39 +155,6 @@ Restart=on-failure
 EOF
 ```
 
-## Create ports.conf to override apache port
-
-```sh
-cat >> ~/lb-ports.conf<<EOF
-# If you just change the port or add more ports here, you will likely also
-# have to change the VirtualHost statement in
-# /etc/apache2/sites-enabled/000-default.conf
-
-Listen 8080
-
-<IfModule ssl_module>
-        Listen 8443
-</IfModule>
-
-<IfModule mod_gnutls.c>
-        Listen 8443
-</IfModule>
-EOF
-```
-
-## Create virtual server conf to override apache port
-
-```sh
-cat >> ~/ lb-000-default.conf<<EOF
-<VirtualHost *:8080>
-    ServerAdmin webmaster@localhost
-    DocumentRoot /var/www/html
-    ErrorLog ${APACHE_LOG_DIR}/error.log
-    CustomLog ${APACHE_LOG_DIR}/access.log combined
-</VirtualHost>
-EOF
-```
-
 ## Create permanent conf dir for LB
 
 ```sh
