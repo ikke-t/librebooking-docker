@@ -126,5 +126,8 @@ tail --follow "${LB_LOGGING_FOLDER}/app.log" >> /dev/stdout &
 touch "${LB_LOGGING_FOLDER}/sql.log"
 tail --follow "${LB_LOGGING_FOLDER}/sql.log" >> /dev/stdout &
 
+# start cron
+/usr/local/bin/supercronic /config/lb-jobs-cron &
+
 # Switch to the apache server
 exec "$@"
