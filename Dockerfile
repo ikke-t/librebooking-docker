@@ -18,6 +18,17 @@ COPY --chmod=755 bin /usr/local/bin/
 # Create cron jobs
 COPY --chown=www-data:www-data --chmod=0755 lb-jobs-cron /config/
 
+# Latest releases available at https://github.com/aptible/supercronic/releases
+ENV SUPERCRONIC_URL=https://github.com/aptible/supercronic/releases/download/v0.2.43/supercronic-linux-amd64 \
+    SUPERCRONIC_SHA1SUM=f97b92132b61a8f827c3faf67106dc0e4467ccf2 \
+    SUPERCRONIC=supercronic-linux-amd64
+
+RUN curl -fsSLO "$SUPERCRONIC_URL" \
+ && echo "${SUPERCRONIC_SHA1SUM}  ${SUPERCRONIC}" | sha1sum -c - \
+ && chmod +x "$SUPERCRONIC" \
+ && mv "$SUPERCRONIC" "/usr/local/bin/${SUPERCRONIC}" \
+ && ln -s "/usr/local/bin/${SUPERCRONIC}" /usr/local/bin/supercronic
+
 # Copy composer
 COPY --from=comp /usr/bin/composer /usr/bin/composer
 
@@ -30,7 +41,6 @@ set -xeu
 apt-get update
 apt-get upgrade --yes
 apt-get install --yes --no-install-recommends \
-  cron \
   git \
   libjpeg-dev \
   libldap-dev \
@@ -77,7 +87,7 @@ ARG APP_GH_REF
 ARG APP_GH_ADD_SHA=false
 RUN <<EORUN
 set -xeu
-LB_TARBALL_URL="https://api.github.com/repos/LibreBooking/librebooking/tarball/${APP_GH_REF}"
+LB_TARBALL_URL="https://api.github.com/repos/ikke-t/librebooking/tarball/${APP_GH_REF}"
 curl \
   --fail \
   --silent \
